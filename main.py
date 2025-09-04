@@ -1,24 +1,19 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-
-current_color = {"red": 0, "green": 0, "blue": 0}
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["*"],
     allow_headers=["*"],
+    allow_methods=["*"],
 )
 
-@app.get("/color")
-def get_color(red: int = None, green: int = None, blue: int = None):
-    global current_color
-    if red is not None:
-        current_color["red"] = red
-    if green is not None:
-        current_color["green"] = green
-    if blue is not None:
-        current_color["blue"] = blue
-    return current_color
+current = "R"  # 초기 신호
+
+@app.get("/signal")
+def get_or_set_signal(set: str | None = Query(default=None, regex="^[RGB]$")):
+    global current
+    if set is not None:
+        current = set
+    return {"signal": current}
